@@ -2,6 +2,7 @@ package com.example.qrcodereader
 
 import android.Manifest
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.widget.Toast
@@ -24,6 +25,13 @@ class MainActivity : AppCompatActivity() {
 
     private val PERMISSIONS_REQUEST_CODE = 1
     private val PERMISSIONS_REQUIRED = arrayOf(Manifest.permission.CAMERA)
+
+    private var isDetected = false
+
+    override fun onResume() {
+        super.onResume()
+        isDetected = false
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -66,7 +74,12 @@ class MainActivity : AppCompatActivity() {
         imageAnalysis.setAnalyzer(cameraExecutor,
             QRCodeAnalyzer(object : OnDetectListener {
                 override fun onDetect(msg: String) {
-                    Toast.makeText(this@MainActivity, "$msg", Toast.LENGTH_SHORT).show()
+                    if(!isDetected){
+                        isDetected = true
+                        val intent = Intent(this@MainActivity,ResultActivity::class.java)
+                        intent.putExtra("msg",msg)
+                        startActivity(intent)
+                    }
                 }
             })
         )
